@@ -63,49 +63,65 @@ def calculate_arm_pos(final_pos, target, radius=1):
     return [np.linalg.norm(norm_d), np.linalg.norm(trans_d)]
 
 
-def go_brr(arm_length=[1, 1], target=[2, 0]):
-    first_rot = np.linspace(0, 2 * np.pi, 50)
-    second_rot = np.linspace(0, 2 * np.pi, 50)
-
+def go_brr(r1, r2, rm_length=[1, 1], target=[2, 0]):
     rst = np.array([0, 0, 0, 0])
-    for r1 in first_rot:
-        for r2 in second_rot:
-            end = [
-                arm_length[0] * np.cos(r1) + arm_length[1] * np.cos(r2),
-                arm_length[0] * np.sin(r1) + arm_length[1] * np.sin(r2)
-            ]
-            bruh = calculate_arm_pos(end, target)
-            proto_row = [r1, r2, bruh[0], bruh[1]]
-            rst = np.vstack((rst, proto_row))
+    end = [np.cos(r1) + np.cos(r2), np.sin(r1) + np.sin(r2)]
+    bruh = calculate_arm_pos(end, target)
+    proto_row = [r1, r2, bruh[0], bruh[1]]
+    rst = np.vstack((rst, proto_row))
 
     rst = rst[1:]
     return rst.T
 
 
-fig = plt.figure(figsize=plt.figaspect(0.5))
+fig = plt.figure(figsize=plt.figaspect(0.3))
+
+ax0 = fig.add_subplot(1, 3, 1)
 
 #===============
 #  First subplot
 #===============
 # set up the axes for the first plot
-ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+ax1 = fig.add_subplot(1, 3, 2, projection='3d')
 
 #===============
 # Second subplot
 #===============
 # set up the axes for the second plot
-ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+ax2 = fig.add_subplot(1, 3, 3, projection='3d')
 
+ax0.set_xlim(-5, 5)
+ax0.set_ylim(-5, 5)
 ax1.set_zlim(0, 5)
 ax2.set_zlim(0, 5)
+ax1.set_xlim(0, 7)
+ax2.set_xlim(0, 7)
+ax1.set_ylim(0, 7)
+ax2.set_ylim(0, 7)
 if __name__ == "__main__":
-    mtx = go_brr(arm_length=[1, 5], target=[2, 2])
-    ax1.plot_trisurf(mtx[0], mtx[1], mtx[2])
-    ax1.set_title("Normal Euclidean Distance, Arm Length (1,5), Target (2, 2)")
+    rot1, rot2 = 0.7, 1
+    mtx = go_brr(rot1, rot2)
 
-    ax2.plot_trisurf(mtx[0], mtx[1], mtx[3])
-    ax2.set_title(
-        "Transformed Euclidean Distance, Arm Length (1,5), Target (2, 2)")
+    arr = [[np.cos(rot1), np.sin(rot1)],
+           [np.cos(rot1) + np.cos(rot2),
+            np.sin(rot1) + np.cos(rot2)]]
+    theta = np.linspace(0, 2 * np.pi, 100)
 
-    print(mtx[0][539], mtx[1][539])
+    # Circle of inversion
+    r = np.linalg.norm(np.array(arr[0]))
+    x1 = r * np.cos(theta)
+    x2 = r * np.sin(theta)
+
+    v = [[0, 0]]
+    for vector in arr:
+        v = np.linspace(v[-1], vector, 100)
+        ax0.plot(v.T[0], v.T[1])
+    ax0.plot(x1, x2)
+    ax0.plot(2, 0, "go")
+    ax1.plot(mtx[0], mtx[1], mtx[2], "go")
+    ax1.set_title("Normal Euclidean Distance")
+
+    ax2.plot(mtx[0], mtx[1], mtx[3], "go")
+    ax2.set_title("Transformed Euclidean Distance")
+
     plt.show()
