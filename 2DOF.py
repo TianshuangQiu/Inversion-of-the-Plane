@@ -99,13 +99,13 @@ ax2 = fig.add_subplot(1, 2, 2, projection='3d')
 ax1.set_zlim(0, 5)
 ax2.set_zlim(0, 5)
 if __name__ == "__main__":
-    mtx = go_brr(arm_length=[1, 5], target=[2, 2])
+    mtx = go_brr(arm_length=[1, 1], target=[2, 0])
     ax1.plot_trisurf(mtx[0], mtx[1], mtx[2])
-    ax1.set_title("Normal Euclidean Distance, Arm Length (1,5), Target (2, 2)")
+    ax1.set_title("Normal Euclidean Distance, Arm Length (1,1), Target (2, 0)")
 
     ax2.plot_trisurf(mtx[0], mtx[1], mtx[3])
     ax2.set_title(
-        "Transformed Euclidean Distance, Arm Length (1,5), Target (2, 2)")
+        "Transformed Euclidean Distance, Arm Length (1,1), Target (2, 0)")
 
     print(mtx[0][539], mtx[1][539])
     plt.show()
